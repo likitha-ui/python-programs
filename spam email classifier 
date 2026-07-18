@@ -1,0 +1,68 @@
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+
+# Sample dataset
+data = {
+    "message": [
+        "Congratulations! You won a free iPhone",
+        "Claim your lottery prize now",
+        "Meeting at 10 AM tomorrow",
+        "Please submit your assignment today",
+        "You have won cash reward",
+        "Call me when you are free",
+        "Limited time offer! Buy now",
+        "Let's have lunch together",
+        "Your bank account needs verification",
+        "Happy Birthday! Have a great day"
+    ],
+    "label": [
+        "spam",
+        "spam",
+        "ham",
+        "ham",
+        "spam",
+        "ham",
+        "spam",
+        "ham",
+        "spam",
+        "ham"
+    ]
+}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Convert text into numbers
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(df["message"])
+
+# Labels
+y = df["label"]
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train model
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+# Test accuracy
+predictions = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, predictions) * 100, "%")
+
+# Predict a new email
+while True:
+    email = input("\nEnter an email message (or type 'exit'): ")
+
+    if email.lower() == "exit":
+        break
+
+    email_vector = vectorizer.transform([email])
+    prediction = model.predict(email_vector)
+
+    print("Prediction:", prediction[0].upper())
